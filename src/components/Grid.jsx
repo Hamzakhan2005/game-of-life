@@ -28,15 +28,23 @@ const Grid = ({ liveCells, setLiveCells }) => {
 
     drawGrid();
   }, [cellSize, liveCells]);
-  const handleZoom = (event) => {
-    event.preventDefault();
-    let newSize = cellSize + (event.deltaY < 0 ? 2 : -2); // Zoom in/out
 
-    // Set min/max limits for cell size
-    newSize = Math.min(Math.max(newSize, 5), 50);
+  useEffect(() => {
+    const handleZoom = (event) => {
+      event.preventDefault();
+      let newSize = cellSize + (event.deltaY < 0 ? 2 : -2); // Zoom in/out
 
-    setCellSize(newSize);
-  };
+      // Set min/max limits for cell size
+      newSize = Math.min(Math.max(newSize, 5), 50);
+
+      setCellSize(newSize);
+    };
+
+    const canvas = canvasRef.current;
+    canvas.addEventListener("wheel", handleZoom, { passive: false });
+
+    return () => canvas.removeEventListener("wheel", handleZoom);
+  });
   const handleClick = (event) => {
     const rect = canvasRef.current.getBoundingClientRect();
     const x = event.clientX - rect.left;
@@ -61,7 +69,7 @@ const Grid = ({ liveCells, setLiveCells }) => {
       className="grid"
       ref={canvasRef}
       onClick={handleClick}
-      onWheel={handleZoom}
+      // onWheel={handleZoom}
     ></canvas>
   );
 };
